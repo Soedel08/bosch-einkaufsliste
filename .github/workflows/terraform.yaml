@@ -28,18 +28,6 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Create main.tf
-        run: |
-          cat > main.tf <<EOF
-          provider "aws" {
-            region = "us-east-1"
-          }
-
-          resource "aws_s3_bucket" "site_bucket" {
-            bucket = "bosch-einkaufsliste"
-          }
-          EOF
-
       - name: Terraform init
         run: terraform init
 
