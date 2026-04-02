@@ -51,3 +51,6 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve
+
+      - name: Upload index.html to S3
+        run: aws s3 cp index.html s3://bosch-einkaufsliste/index.html
