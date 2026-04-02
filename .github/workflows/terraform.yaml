@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AWS_REGION: us-east-1
+      S3_BUCKET_NAME: bosch-einkaufsliste
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,6 +29,22 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Create main.tf
+        run: |
+          cat > main.tf <<EOF
+          provider "aws" {
+            region = "us-east-1"
+          }
+
+          resource "aws_s3_bucket" "site_bucket" {
+            bucket = var.bucket_name
+          }
+
+          variable "bucket_name" {
+            type = string
+          }
+          EOF
+
       - name: Terraform init
         run: terraform init
 
@@ -35,10 +52,10 @@ jobs:
         run: terraform validate
 
       - name: Terraform plan
-        run: terraform plan
+        run: terraform plan -var="bucket_name=${S3_BUCKET_NAME}"
 
       - name: Terraform apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -var="bucket_name=${S3_BUCKET_NAME}"
 
       - name: Upload index.html to S3
-        run: aws s3 cp index.html s3://bosch-einkaufsliste/index.html
+        run: aws s3 cp index.html s3://$S3_BUCKET_NAME/index.html
